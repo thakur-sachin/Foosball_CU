@@ -1,0 +1,196 @@
+<mujoco>
+    <compiler texturedir="asset"/>
+
+    <extension>
+      <plugin plugin="mujoco.sdf.sdflib">
+        <instance name="sdf1">
+          <config key="aabb" value="0"/>
+        </instance>
+      </plugin>
+      <plugin plugin="mujoco.sdf.sdflib">
+        <instance name="sdf2">
+          <config key="aabb" value="0"/>
+        </instance>
+      </plugin>
+      <plugin plugin="mujoco.sdf.sdflib">
+        <instance name="sdf3">
+          <config key="aabb" value="0"/>
+        </instance>
+      </plugin>
+    </extension>
+
+    <asset>
+        <texture name="chess_pattern" type="2d" file="chessboard.png"/>
+        <material name="chess" texture="chess_pattern"/>
+
+        <mesh name="table" file="asset/foosball_table.obj" >
+          <plugin instance="sdf1"/>
+        </mesh>
+
+        <mesh name="paddle2" file="asset/foosball_paddle2.obj" >
+          <plugin instance="sdf2"/>
+        </mesh>
+
+        <mesh name="paddle3" file="asset/foosball_paddle3.obj" >
+            <plugin instance="sdf3"/>
+          </mesh>     
+      </asset>
+      
+      <option sdf_iterations="20" sdf_initpoints="40"/>
+
+      <visual>
+        <map force="1000"/>
+      </visual>
+
+      <default>
+        <geom solref="0.01 1" solimp=".95 .99 .0001" friction="0.5"/>
+      </default>
+
+      <statistic meansize="0.2"/>
+
+      <include file="foosball_scene.xml"/>
+
+      <worldbody>
+        <!-- TABLE-->
+        <body name="table" euler="0 0 0" pos="0 0 0">
+          <inertial pos="0 0 0.544987129" quat="1 0 0 0" mass="43.183934369999974" 
+                    diaginertia="1309.08179 322.217164 1598.10497"/>
+          <geom type="sdf" name="table" mesh="table" rgba='0.5 0.5 0.5 1'>
+            <plugin instance="sdf1"/>
+          </geom>
+        </body>
+
+        <!-- paddle For A --><!-- paddle For A --><!-- paddle For A --><!-- paddle For A -->
+
+          <body name="A_1_paddle3" euler="0 90 0" pos="0 8.5 2.5">
+          <inertial pos="0.301556161 0 0" quat="1 0 0 0" mass="0.9077230663009997" 
+                    diaginertia="4.66694774 4.95478689 0.298935845"/>
+          <joint name="lin_A_1" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+          <joint name="rev_A_1" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+          <geom type="sdf" name="A_1_paddle3" mesh="paddle3" rgba='0.5 0.1 0.1 1'>
+            <plugin instance="sdf3"/>
+          </geom>
+        </body>
+     
+        <body name="A_2_paddle2" euler="0 90 0" pos="0 6.0 2.5">
+            <inertial pos="0.254384516 0 0" quat="1 0 0 0" mass="0.7173620993181127" 
+            diaginertia="3.44873799 3.64923899 0.208568389"/>
+            <joint name="lin_A_2" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+            <joint name="rev_A_2" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+            <geom type="sdf" name="A_2_paddle2" mesh="paddle2" rgba='0.5 0.1 0.1 1'>
+              <plugin instance="sdf2"/>
+            </geom>
+        </body>
+
+        <body name="A_3_paddle3" euler="0 90 0" pos="0 1.2 2.5">
+            <inertial pos="0.301556161 0 0" quat="1 0 0 0" mass="0.9077230663009997" 
+                      diaginertia="4.66694774 4.95478689 0.298935845"/>
+            <joint name="lin_A_3" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+            <joint name="rev_A_3" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+            <geom type="sdf" name="A_3_paddle3" mesh="paddle3" rgba='0.5 0.1 0.1 1'>
+              <plugin instance="sdf3"/>
+            </geom>
+        </body>
+
+        <body name="A_4_paddle3" euler="0 90 0" pos="0 -3.6 2.5">
+            <inertial pos="0.301556161 0 0" quat="1 0 0 0" mass="0.9077230663009997" 
+                      diaginertia="4.66694774 4.95478689 0.298935845"/>
+            <joint name="lin_A_4" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+            <joint name="rev_A_4" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+            <geom type="sdf" name="A_4_paddle3" mesh="paddle3" rgba='0.5 0.1 0.1 1'>
+              <plugin instance="sdf3"/>
+            </geom>
+        </body>
+
+        <!-- paddle For B --><!-- paddle For B --><!-- paddle For B --><!-- paddle For B -->
+
+        <body name="B_1_paddle3" euler="0 90 0" pos="0 -8.5 2.5">
+            <inertial pos="0.301556161 0 0" quat="1 0 0 0" mass="0.9077230663009997" 
+                      diaginertia="4.66694774 4.95478689 0.298935845"/>
+            <joint name="lin_B_1" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+            <joint name="rev_B_1" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+            <geom type="sdf" name="B_1_paddle3" mesh="paddle3" rgba='0.1 0.1 0.5 1'>
+              <plugin instance="sdf3"/>
+            </geom>
+          </body>
+
+          <body name="B_2_paddle2" euler="0 90 0" pos="0 -6.0 2.5">
+              <inertial pos="0.254384516 0 0" quat="1 0 0 0" mass="0.7173620993181127" 
+              diaginertia="3.44873799 3.64923899 0.208568389"/>
+              <joint name="lin_B_2" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+              <joint name="rev_B_2" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+              <geom type="sdf" name="B_2_paddle2" mesh="paddle2" rgba='0.1 0.1 0.5 1'>
+                <plugin instance="sdf2"/>
+              </geom>
+          </body>
+
+          <body name="B_3_paddle3" euler="0 90 0" pos="0 -1.2 2.5">
+              <inertial pos="0.301556161 0 0" quat="1 0 0 0" mass="0.9077230663009997" 
+                        diaginertia="4.66694774 4.95478689 0.298935845"/>
+              <joint name="lin_B_3" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+              <joint name="rev_B_3" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+              <geom type="sdf" name="B_3_paddle3" mesh="paddle3" rgba='0.1 0.1 0.5 1'>
+                <plugin instance="sdf3"/>
+              </geom>
+          </body>
+
+          <body name="B_4_paddle3" euler="0 90 0" pos="0 3.6 2.5">
+              <inertial pos="0.301556161 0 0" quat="1 0 0 0" mass="0.9077230663009997" 
+                        diaginertia="4.66694774 4.95478689 0.298935845"/>
+              <joint name="lin_B_4" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+              <joint name="rev_B_4" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+              <geom type="sdf" name="B_4_paddle3" mesh="paddle3" rgba='0.1 0.1 0.5 1'>
+                <plugin instance="sdf3"/>
+              </geom>
+          </body>
+
+
+
+        <!-- BALL -->
+        <body name="ball" pos="0 0 2">
+          <geom name="ball_geom" type="sphere" size=".4" rgba="1.0 1.0 1.0 1" density="1" 
+                condim="3" friction="0.7 0.005 0.0001" mass="0.1" material='chess'/>
+          <joint name="ball_free_joint" type="free" damping="0.1"/>
+      </body>
+
+        <light name="left" pos="0 0 1"/>
+        <light name="right" pos="1 0 1"/>
+      </worldbody>
+
+      <!-- Since SDF plugin deos not render the small size of holes of table, 
+       I excluded the contact occurring between paddle paddles and the table
+       just to check the motion of ball inside-->
+      <contact>
+        <exclude body1="A_1_paddle3" body2="table"/>
+        <exclude body1="A_2_paddle2" body2="table"/>
+        <exclude body1="A_3_paddle3" body2="table"/>
+        <exclude body1="A_4_paddle3" body2="table"/>
+        <exclude body1="B_1_paddle3" body2="table"/>
+        <exclude body1="B_2_paddle2" body2="table"/>
+        <exclude body1="B_3_paddle3" body2="table"/>
+        <exclude body1="B_4_paddle3" body2="table"/>
+      </contact>
+
+
+      <actuator>
+        <position joint="lin_A_1" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_A_1" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="lin_A_2" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_A_2" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="lin_A_3" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_A_3" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="lin_A_4" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_A_4" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+
+        <position joint="lin_B_1" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_B_1" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="lin_B_2" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_B_2" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="lin_B_3" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_B_3" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="lin_B_4" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+        <position joint="rev_B_4" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+
+    </actuator>
+
+    </mujoco>
