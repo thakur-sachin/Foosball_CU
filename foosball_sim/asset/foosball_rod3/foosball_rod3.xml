@@ -1,0 +1,42 @@
+<mujoco model="foosball_rod3">
+  <!-- <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default> -->
+  <asset>
+    <mesh file="foosball_rod3.obj"/>
+    <mesh file="foosball_rod3_collision_0.obj"/>
+    <mesh file="foosball_rod3_collision_1.obj"/>
+    <mesh file="foosball_rod3_collision_2.obj"/>
+    <mesh file="foosball_rod3_collision_3.obj"/>
+    <mesh file="foosball_rod3_collision_4.obj"/>
+    <mesh file="foosball_rod3_collision_5.obj"/>
+    <mesh file="foosball_rod3_collision_6.obj"/>
+    <mesh file="foosball_rod3_collision_7.obj"/>
+    <mesh file="foosball_rod3_collision_8.obj"/>
+    <mesh file="foosball_rod3_collision_9.obj"/>
+    <mesh file="foosball_rod3_collision_10.obj"/>
+    <mesh file="foosball_rod3_collision_11.obj"/>
+  </asset>
+  <worldbody>
+    <body name="foosball_rod3">
+      <geom mesh="foosball_rod3" class="visual"/>
+      <geom mesh="foosball_rod3_collision_0" rgba="0.6860203166524936 0.39392522902127636 0.5499926328034973 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_1" rgba="0.6910743868144654 0.9639031219821114 0.43845334968200034 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_2" rgba="0.4496901971686671 0.8285735271974112 0.38568708114786765 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_3" rgba="0.17606084750093454 0.5136561876320481 0.07344138880423934 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_4" rgba="0.834759096054905 0.07999147123515427 0.5860544674903398 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_5" rgba="0.24197937485936927 0.25619657346135694 0.6375152152766799 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_6" rgba="0.8368441362283063 0.36012654840735037 0.4507202562081496 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_7" rgba="0.9204025708512719 0.29304148969007526 0.7048739649119482 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_8" rgba="0.6937004850859976 0.6857633936447357 0.08553342741734316 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_9" rgba="0.6184125712725201 0.684543813513795 0.5159651950985649 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_10" rgba="0.24951833085745456 0.035983667909578076 0.46737829690104715 1" class="collision"/>
+      <geom mesh="foosball_rod3_collision_11" rgba="0.2852023552739217 0.8629187448599792 0.029662962928124093 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

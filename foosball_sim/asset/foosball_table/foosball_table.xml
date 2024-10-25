@@ -1,0 +1,110 @@
+<mujoco model="foosball_table">
+  <!-- <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default> -->
+  <asset>
+    <mesh file="foosball_table.obj"/>
+    <mesh file="foosball_table_collision_0.obj"/>
+    <mesh file="foosball_table_collision_1.obj"/>
+    <mesh file="foosball_table_collision_2.obj"/>
+    <mesh file="foosball_table_collision_3.obj"/>
+    <mesh file="foosball_table_collision_4.obj"/>
+    <mesh file="foosball_table_collision_5.obj"/>
+    <mesh file="foosball_table_collision_6.obj"/>
+    <mesh file="foosball_table_collision_7.obj"/>
+    <mesh file="foosball_table_collision_8.obj"/>
+    <mesh file="foosball_table_collision_9.obj"/>
+    <mesh file="foosball_table_collision_10.obj"/>
+    <mesh file="foosball_table_collision_11.obj"/>
+    <mesh file="foosball_table_collision_12.obj"/>
+    <mesh file="foosball_table_collision_13.obj"/>
+    <mesh file="foosball_table_collision_14.obj"/>
+    <mesh file="foosball_table_collision_15.obj"/>
+    <mesh file="foosball_table_collision_16.obj"/>
+    <mesh file="foosball_table_collision_17.obj"/>
+    <mesh file="foosball_table_collision_18.obj"/>
+    <mesh file="foosball_table_collision_19.obj"/>
+    <mesh file="foosball_table_collision_20.obj"/>
+    <mesh file="foosball_table_collision_21.obj"/>
+    <mesh file="foosball_table_collision_22.obj"/>
+    <mesh file="foosball_table_collision_23.obj"/>
+    <mesh file="foosball_table_collision_24.obj"/>
+    <mesh file="foosball_table_collision_25.obj"/>
+    <mesh file="foosball_table_collision_26.obj"/>
+    <mesh file="foosball_table_collision_27.obj"/>
+    <mesh file="foosball_table_collision_28.obj"/>
+    <mesh file="foosball_table_collision_29.obj"/>
+    <mesh file="foosball_table_collision_30.obj"/>
+    <mesh file="foosball_table_collision_31.obj"/>
+    <mesh file="foosball_table_collision_32.obj"/>
+    <mesh file="foosball_table_collision_33.obj"/>
+    <mesh file="foosball_table_collision_34.obj"/>
+    <mesh file="foosball_table_collision_35.obj"/>
+    <mesh file="foosball_table_collision_36.obj"/>
+    <mesh file="foosball_table_collision_37.obj"/>
+    <mesh file="foosball_table_collision_38.obj"/>
+    <mesh file="foosball_table_collision_39.obj"/>
+    <mesh file="foosball_table_collision_40.obj"/>
+    <mesh file="foosball_table_collision_41.obj"/>
+    <mesh file="foosball_table_collision_42.obj"/>
+    <mesh file="foosball_table_collision_43.obj"/>
+    <mesh file="foosball_table_collision_44.obj"/>
+    <mesh file="foosball_table_collision_45.obj"/>
+  </asset>
+  <worldbody>
+    <body name="foosball_table">
+      <geom mesh="foosball_table" class="visual"/>
+      <geom mesh="foosball_table_collision_0" rgba="0.8180586146247812 0.2450845007818132 0.735730089898863 1" class="collision"/>
+      <geom mesh="foosball_table_collision_1" rgba="0.43307815687637197 0.017055733377612126 0.14498809245514022 1" class="collision"/>
+      <geom mesh="foosball_table_collision_2" rgba="0.8168187763769582 0.5903952015517497 0.5081165308321469 1" class="collision"/>
+      <geom mesh="foosball_table_collision_3" rgba="0.8281806589581109 0.1403010292364114 0.4388560691988991 1" class="collision"/>
+      <geom mesh="foosball_table_collision_4" rgba="0.25200287301094515 0.03417839970450942 0.7018962591749647 1" class="collision"/>
+      <geom mesh="foosball_table_collision_5" rgba="0.6055629540701839 0.46640945104860954 0.5142861571648344 1" class="collision"/>
+      <geom mesh="foosball_table_collision_6" rgba="0.6316997062193623 0.0722983582961717 0.5573331934579582 1" class="collision"/>
+      <geom mesh="foosball_table_collision_7" rgba="0.26045973873096695 0.6504902971904455 0.8570155006573712 1" class="collision"/>
+      <geom mesh="foosball_table_collision_8" rgba="0.491940394001649 0.36912044334110683 0.8984421189147229 1" class="collision"/>
+      <geom mesh="foosball_table_collision_9" rgba="0.13180167773313645 0.1890587537213757 0.04557090015088683 1" class="collision"/>
+      <geom mesh="foosball_table_collision_10" rgba="0.11791718150280717 0.947354710870136 0.34317569604650344 1" class="collision"/>
+      <geom mesh="foosball_table_collision_11" rgba="0.17846499085185819 0.13833715267039914 0.29372768085417256 1" class="collision"/>
+      <geom mesh="foosball_table_collision_12" rgba="0.3295319255631196 0.18615536286029555 0.9472328080940526 1" class="collision"/>
+      <geom mesh="foosball_table_collision_13" rgba="0.2265953436159932 0.5927338480376323 0.6144273156184962 1" class="collision"/>
+      <geom mesh="foosball_table_collision_14" rgba="0.6833371223815261 0.8300274795832832 0.5308512476082071 1" class="collision"/>
+      <geom mesh="foosball_table_collision_15" rgba="0.10938386508512055 0.12819653039632817 0.7713198166701354 1" class="collision"/>
+      <geom mesh="foosball_table_collision_16" rgba="0.12023376113225992 0.5926799431335043 0.6404295923290761 1" class="collision"/>
+      <geom mesh="foosball_table_collision_17" rgba="0.6392766256584681 0.8016754185671493 0.3587786930960377 1" class="collision"/>
+      <geom mesh="foosball_table_collision_18" rgba="0.8559520807658726 0.167252447628765 0.2790140132051716 1" class="collision"/>
+      <geom mesh="foosball_table_collision_19" rgba="0.3464449085060336 0.9408424333718141 0.6589806656681392 1" class="collision"/>
+      <geom mesh="foosball_table_collision_20" rgba="0.7942006102090502 0.47992445634100156 0.5814912158103018 1" class="collision"/>
+      <geom mesh="foosball_table_collision_21" rgba="0.6765339495287137 0.059854747071486525 0.6215148079327677 1" class="collision"/>
+      <geom mesh="foosball_table_collision_22" rgba="0.16029349790434533 0.8567093235541222 0.005886205510152176 1" class="collision"/>
+      <geom mesh="foosball_table_collision_23" rgba="0.09873153900008524 0.7252215304131855 0.5665417919855554 1" class="collision"/>
+      <geom mesh="foosball_table_collision_24" rgba="0.556962244965315 0.6923233890928933 0.8559078079223782 1" class="collision"/>
+      <geom mesh="foosball_table_collision_25" rgba="0.3694642867561556 0.7291773214583149 0.9803339130429106 1" class="collision"/>
+      <geom mesh="foosball_table_collision_26" rgba="0.2866357801549224 0.5322984260955768 0.009553127026568964 1" class="collision"/>
+      <geom mesh="foosball_table_collision_27" rgba="0.6641395001636506 0.2250486844208318 0.22106232215098576 1" class="collision"/>
+      <geom mesh="foosball_table_collision_28" rgba="0.9601465188480452 0.3472351007942375 0.11419775417180167 1" class="collision"/>
+      <geom mesh="foosball_table_collision_29" rgba="0.9924380863982569 0.05049071935197369 0.5174236385225955 1" class="collision"/>
+      <geom mesh="foosball_table_collision_30" rgba="0.8109114822302957 0.32046652002990883 0.6216919831720661 1" class="collision"/>
+      <geom mesh="foosball_table_collision_31" rgba="0.5603150579685668 0.6917197628814226 0.7594904060805495 1" class="collision"/>
+      <geom mesh="foosball_table_collision_32" rgba="0.28674688916526037 0.25628422504525195 0.9090896330264869 1" class="collision"/>
+      <geom mesh="foosball_table_collision_33" rgba="0.030373927536039735 0.27243148760177893 0.7453597290178992 1" class="collision"/>
+      <geom mesh="foosball_table_collision_34" rgba="0.9637503516010059 0.2631671627803237 0.44520096536704934 1" class="collision"/>
+      <geom mesh="foosball_table_collision_35" rgba="0.15250436136431156 0.777751953121553 0.22625943202093834 1" class="collision"/>
+      <geom mesh="foosball_table_collision_36" rgba="0.845831750973774 0.970956308002963 0.5503683538402158 1" class="collision"/>
+      <geom mesh="foosball_table_collision_37" rgba="0.35438703768749935 0.28557172853959834 0.6535030032207788 1" class="collision"/>
+      <geom mesh="foosball_table_collision_38" rgba="0.09659369426770714 0.6525569473138579 0.25372615910620133 1" class="collision"/>
+      <geom mesh="foosball_table_collision_39" rgba="0.029394727803360388 0.9666260276437518 0.651509273627029 1" class="collision"/>
+      <geom mesh="foosball_table_collision_40" rgba="0.8787647278692012 0.21267291085106976 0.6262643318944506 1" class="collision"/>
+      <geom mesh="foosball_table_collision_41" rgba="0.6128065786904622 0.34860362238093223 0.030154733076920515 1" class="collision"/>
+      <geom mesh="foosball_table_collision_42" rgba="0.7520369631984372 0.21848767977147188 0.577136707269128 1" class="collision"/>
+      <geom mesh="foosball_table_collision_43" rgba="0.7600590780812728 0.4859599088264449 0.3869615161502773 1" class="collision"/>
+      <geom mesh="foosball_table_collision_44" rgba="0.3054670588039837 0.6028298071194002 0.42544789210628997 1" class="collision"/>
+      <geom mesh="foosball_table_collision_45" rgba="0.24791401075483777 0.4350251353641734 0.7474591345043696 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

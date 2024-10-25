@@ -1,0 +1,25 @@
+<mujoco>
+    <worldbody>
+      <body name="rod2_B2" euler="0 90 0" pos="0 -6.0 2.5">
+        <inertial pos="0.254384516 0 0" quat="1 0 0 0" mass="0.7173620993181127" 
+                  diaginertia="3.44873799 3.64923899 0.208568389"/>
+        <joint name="lin_B2" type="slide" pos="0 0 0" axis="0 0 1" range="-300 300"/>
+        <joint name="rev_B2" type="hinge" pos="0 0 0" axis="0 0 1" range="-60.0 60.0"/>
+        <geom type="mesh" mesh="rod2_0" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_1" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_2" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_3" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_4" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_5" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_6" rgba='0.1 0.1 0.5 1'/>
+        <geom type="mesh" mesh="rod2_7" rgba='0.1 0.1 0.5 1'/>
+      </body>  
+    </worldbody>
+  
+    <actuator>
+      <position joint="lin_B2" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+      <position joint="rev_B2" ctrlrange="-1.0 1.0" kp="2000" kv="100" />
+    </actuator>
+  
+  </mujoco>
+  
