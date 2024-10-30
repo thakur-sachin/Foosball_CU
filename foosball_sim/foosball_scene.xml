@@ -1,0 +1,27 @@
+<mujoco>
+    <compiler texturedir="asset"/>
+  
+    <statistic meansize=".05"/>
+  
+    <visual>
+      <rgba haze="0.15 0.25 0.35 1"/>
+      <map stiffness="700" shadowscale="0.5" fogstart="1" fogend="15" zfar="40" haze="1" shadowclip="3"/>
+    </visual>
+  
+    <asset>
+      <texture name="field_pattern" type="2d" file="field.png"/>
+      <material name="field" texture="field_pattern"/>
+
+      <texture type="skybox" builtin="gradient" rgb1="0.2 0.5 0.2" rgb2="0 0 0" width="1024" height="1024"/>
+      <texture name="texplane" type="2d" builtin="checker" rgb1=".4 .7 .4" rgb2=".1 0.4 0.1"
+        width="1024" height="1024" mark="cross" markrgb=".0 .0 .0"/>
+  
+      <material name="matplane" reflectance="0.05" texture="texplane" texrepeat="1 1" texuniform="true"/>
+    </asset>
+  
+    <worldbody>
+      <light directional="true" diffuse=".8 .8 .8" specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1"/>
+      <geom name="ground" type="plane" pos="0 0 -0.002" size="6.7 12.5 .01" material="field" condim="1"/>
+    </worldbody>
+  </mujoco>
+  
