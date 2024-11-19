@@ -3,13 +3,15 @@ from gymnasium import spaces
 import numpy as np
 import mujoco
 import os
-import glfw
 
+from ai_agents.v1.gym.mujoco_table_render_mixin import MujocoTableRenderMixin
+
+DIRECTION_CHANGE = 1
 TABLE_MAX_Y_DIM = 10
 BALL_STOPPED_COUNT_THRESHOLD = 100
 SIM_PATH = os.environ.get('SIM_PATH', '/Research/Foosball_CU/foosball_sim/v1/foosball_sim.xml')
 
-class FoosballEnv(gym.Env):
+class FoosballEnv(MujocoTableRenderMixin, gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
     def __init__(self, antagonist_model=None, play_until_goal=False, verbose_mode=False):
@@ -32,7 +34,7 @@ class FoosballEnv(gym.Env):
 
         action_high = np.ones(self.protagonist_action_size)
         self.action_space = spaces.Box(
-            low=-1.0 * action_high, high=1.0 * action_high, dtype=np.float32
+            low=-3.5 * action_high, high=3.5 * action_high, dtype=np.float32
         )
 
         obs_dim = 38
@@ -68,7 +70,7 @@ class FoosballEnv(gym.Env):
 
         # Randomize ball position at reset
         self.data.qpos[qpos_adr:qpos_adr + 3] = np.random.normal(
-            loc=[-0.5, 0.0, 0.55], scale=[0.2, 0.2, 0.0]
+            loc=[-0.5, 0.0, 0.55], scale=[0.5, 0.5, 0.0]
         )
 
         self.simulation_time = 0
@@ -84,7 +86,7 @@ class FoosballEnv(gym.Env):
         antagonist_observation = self._get_antagonist_obs()
 
         if self.antagonist_model is not None:
-            antagonist_action, _state = self.antagonist_model.predict(antagonist_observation)
+            antagonist_action = self.antagonist_model.predict(antagonist_observation)
             antagonist_action = np.clip(antagonist_action, -1.0, 1.0)
 
             antagonist_action = self._adjust_antagonist_action(antagonist_action)
@@ -105,11 +107,6 @@ class FoosballEnv(gym.Env):
         info = {}
 
         return obs, reward, terminated, False, info
-
-    def close(self):
-        if self.viewer is not None:
-            self.viewer.close()
-            self.viewer = None
 
     def _get_obs(self):
         ball_joint_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint')
@@ -261,7 +258,7 @@ class FoosballEnv(gym.Env):
         ball_y = self.data.qpos[qpos_adr + 1]
 
         if self.prev_ball_y is not None:
-            progress = (ball_y - self.prev_ball_y) * -1.0
+            progress = (ball_y - self.prev_ball_y) * DIRECTION_CHANGE
         else:
             progress = 0.0
         self.prev_ball_y = ball_y
@@ -276,12 +273,14 @@ class FoosballEnv(gym.Env):
         healthy_reward = self.healthy_reward
         ctrl_cost = self.control_cost(protagonist_action)
 
-        victory = 10000 if ball_y < -1 *  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
-        loss = -10000 if ball_y > TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
+        victory = -10000 * DIRECTION_CHANGE if ball_y < -1 *  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
+        loss = 10000 * DIRECTION_CHANGE if ball_y > TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
 
         progress_penalty = -100 if self.no_progress_steps >= 10 else 0
 
-        reward = loss + victory + progress_reward + healthy_reward - ctrl_cost + progress_penalty
+        continuation_reward = 110
+
+        reward = loss + victory + progress_reward + healthy_reward + progress_penalty + continuation_reward
 
         return reward
 
@@ -346,59 +345,3 @@ class FoosballEnv(gym.Env):
 
     def seed(self, seed=None):
         np.random.seed(seed)
-
-    def render(self, mode='human'):
-        if self.viewer is None:
-            if not glfw.init():
-                raise Exception("Could not initialize GLFW")
-
-            self.window = glfw.create_window(800, 600, "Foosball Simulation", None, None)
-            if not self.window:
-                glfw.terminate()
-                raise Exception("Could not create GLFW window")
-
-            glfw.make_context_current(self.window)
-
-            self.cam = mujoco.MjvCamera()
-            mujoco.mjv_defaultCamera(self.cam)
-            self.cam.azimuth = 180.0
-            self.cam.elevation = -70.0
-            self.cam.distance = 25.0
-            self.cam.lookat[:] = np.array([2, 0, 0])
-
-            self.opt = mujoco.MjvOption()
-            mujoco.mjv_defaultOption(self.opt)
-            self.scn = mujoco.MjvScene(self.model, maxgeom=1000)
-
-            self.ctx = mujoco.MjrContext(
-                self.model, mujoco.mjtFontScale.mjFONTSCALE_150
-            )
-
-            self.viewer = True  # Flag to indicate that the viewer is initialized
-
-        if not glfw.window_should_close(self.window):
-            mujoco.mjv_updateScene(
-                self.model,
-                self.data,
-                self.opt,
-                None,
-                self.cam,
-                mujoco.mjtCatBit.mjCAT_ALL,  # 'catmask' argument
-                self.scn
-            )
-
-            viewport_width, viewport_height = glfw.get_framebuffer_size(self.window)
-            viewport = mujoco.MjrRect(0, 0, viewport_width, viewport_height)
-
-            mujoco.mjr_render(viewport, self.scn, self.ctx)
-
-            glfw.swap_buffers(self.window)
-            glfw.poll_events()
-        else:
-            self.close()
-
-    def close(self):
-        if self.viewer is not None:
-            glfw.destroy_window(self.window)
-            glfw.terminate()
-            self.viewer = None

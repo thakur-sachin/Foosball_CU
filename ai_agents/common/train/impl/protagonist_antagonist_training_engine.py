@@ -18,12 +18,17 @@ class ProtagonistAntagonistTrainingEngine(TrainingEngine):
     def train(self, total_epochs: int, epoch_timesteps: int, cycle_timesteps: int):
         for epoch in range(total_epochs):
             print(f"Starting epoch {epoch + 1}/{total_epochs}")
+            protagonist_agents = self.agent_manager.get_training_agents()
+            self.agent_manager.initialize_frozen_best_models()
+            antagonist_agents = self.agent_manager.get_frozen_best_models()
+
+
             for cycle in range(self.num_agents_training):
                 print(f"Starting cycle {cycle + 1}/{self.num_agents_training}")
 
                 ## Train the first protagonist agent for now.
-                protagonist_agent = self.agent_manager.get_training_agents()[0]
-                antagonist_agent = self.agent_manager.get_frozen_best_models()[cycle]
+                protagonist_agent = protagonist_agents[0]
+                antagonist_agent = antagonist_agents[cycle]
 
                 env = self.environment_generator(antagonist_agent)
                 protagonist_agent.change_env(env)
@@ -32,7 +37,7 @@ class ProtagonistAntagonistTrainingEngine(TrainingEngine):
             self.current_epoch += 1
 
 
-    def test(self, num_episodes: int = 10):
+    def test(self, num_episodes: int = 100):
         protagonist = self.agent_manager.get_frozen_best_models()[0]
         env = self.environment_generator(protagonist)
 

@@ -8,3 +8,7 @@ class AgentManager(ABC):
     @abstractmethod
     def get_frozen_best_models(self):
         pass
+
+    @abstractmethod
+    def initialize_frozen_best_models(self):
+        pass

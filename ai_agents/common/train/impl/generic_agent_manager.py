@@ -1,17 +1,18 @@
 from ai_agents.common.train.impl.sac_agent import SACFoosballAgent
 from ai_agents.common.train.interface.agent_manager import AgentManager
 
-class SACAgentManager(AgentManager):
-    def __init__(self, num_agents: int, environment_generator):
+class GenericAgentManager(AgentManager):
+    def __init__(self, num_agents: int, environment_generator, agent_class):
         self.num_agents = num_agents
         self.environment_generator = environment_generator
+        self.initial_env = environment_generator()
+        self.agent_class = agent_class
         self.training_agents = []
         self.frozen_best_models = []
 
     def initialize_training_agents(self):
         for i in range(self.num_agents):
-            env = self.environment_generator()
-            agent = SACFoosballAgent(id=i, env=env)
+            agent = self.agent_class(id=i, env=self.initial_env)
             agent.initialize_agent()
             self.training_agents.append(agent)
 
@@ -21,7 +22,7 @@ class SACAgentManager(AgentManager):
 
     def initialize_frozen_best_models(self):
         for i in range(self.num_agents):
-            agent = SACFoosballAgent(id=i)
+            agent = self.agent_class(id=i, env=self.initial_env)
             agent.initialize_agent()
             self.frozen_best_models.append(agent)
 

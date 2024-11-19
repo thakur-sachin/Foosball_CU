@@ -18,8 +18,9 @@ class SACFoosballAgent(FoosballAgent):
     def initialize_agent(self):
         try:
             self.load()
-        except:
-            self.model = SAC('MlpPolicy', self.env)
+        except Exception as e:
+            print(f"Agent {self.id} could not load model. Initializing new model.")
+            self.model = SAC('CnnPolicy', self.env, device='cuda', buffer_size=10000)
         print(f"Agent {self.id} initialized.")
 
     def predict(self, observation, deterministic=False):
@@ -30,7 +31,7 @@ class SACFoosballAgent(FoosballAgent):
 
     def learn(self, total_timesteps):
         if self.model is None:
-            self.model = SAC('MlpPolicy', self.env)
+            self.model = SAC('CnnPolicy', self.env, buffer_size=10000)
         callback = self.create_callback(self.env)
         tb_log_name = f'sac_{self.id}'
         self.model.learn(total_timesteps=total_timesteps, callback=callback, tb_log_name=tb_log_name)
@@ -40,9 +41,8 @@ class SACFoosballAgent(FoosballAgent):
             env,
             best_model_save_path=self.id_subdir + '/best_model',
             log_path=self.log_dir,
-            eval_freq=10000,
+            eval_freq=5000,
             n_eval_episodes=5,
-            deterministic=True,
             render=False,
         )
         return eval_callback
@@ -51,7 +51,7 @@ class SACFoosballAgent(FoosballAgent):
         self.model.save(self.id_subdir + '/best_model')
 
     def load(self):
-        self.model = SAC.load(self.id_subdir + '/best_model')
+        self.model = SAC.load(self.id_subdir + '/best_model/best_model2.zip')
 
     def change_env(self, env):
         self.env = env
