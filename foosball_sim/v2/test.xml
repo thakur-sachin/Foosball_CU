@@ -1,0 +1,178 @@
+<mujoco>
+    <default>
+      <default class="visual">
+        <geom group="2" type="mesh"/>
+      </default>
+      <default class="collision">
+        <geom group="3" type="mesh"/>
+      </default>
+    </default>
+  
+    <extension>
+      <plugin plugin="mujoco.sdf.sdflib">
+        <instance name="sdf1">
+          <config key="aabb" value="0"/>
+        </instance>
+      </plugin>
+      <plugin plugin="mujoco.sdf.sdflib">
+        <instance name="sdf2">
+          <config key="aabb" value="0"/>
+        </instance>
+      </plugin>
+    </extension>
+  
+    <asset>
+      <!-- <texture name="ball_pattern" type="2d" file="ball_texture.jpg"/>
+      <material name="pink_ball" texture="ball_pattern"/> -->
+  
+      <mesh name="table" file="asset/foosball_table/foosball_table.obj"> <!-- already scaled down (0.1)-->
+        <plugin instance="sdf1"/>
+      </mesh>
+
+      <mesh name="guy" file="asset/foosman/mesh_down_foosman.obj" scale='0.1 0.1 0.1' >
+          <plugin instance="sdf2"/>
+      </mesh>
+
+      <mesh name="handle" file="asset/handle/foosball_handle.obj" scale='0.1 0.1 0.1'/>
+    </asset>
+  
+    <option sdf_iterations="20" sdf_initpoints="40"  >
+      <flag contact="enable" />
+    </option>
+    
+    <visual>
+      <map force="1000"/>
+    </visual>
+
+    <statistic meansize="0.2"/>
+    
+    <default>
+      <geom solref="0.004 1" solimp=".99 .99 .00001"  condim="4"/>
+    </default>
+  
+    <include file="foosball_scene.xml"/>
+
+    <worldbody>
+      <!-- TABLE-->
+      <body name="table" euler="90 90 0" pos="0 0 0">
+        <geom type="sdf" name="table" mesh="table" rgba='1.0 1.0 1.0 1' group="2">
+          <plugin instance="sdf1"/>
+        </geom>
+      </body>
+
+
+
+      <!-- Yellow Midfield Rod-->
+      <body name="y_mid_rod" pos="6.887 -7.5 7.75" euler="0 90 0">
+        <joint name="y_mid_linear" type="slide" axis="0 0 1" range="-500 500" stiffness="0"/>
+        <joint name="y_mid_rotation" type="hinge" axis="0 0 1" range="-180.0 180.0" stiffness="0"/>
+        <inertial pos="0 0 0" mass="1.1264" diaginertia="91.364224 91.364224 0.044368"/>
+
+        <!-- Yellow Midfield Aluminum Rod -->
+        <geom type="cylinder" size="0.714375 49.365" pos="0 0 0" rgba="0.8 0.8 0.8 1"/>
+        <!-- Yellow Handle -->
+        <body name="y_mid_rod_handle" pos="0 0 46.34" euler="180 0 0">
+          <geom type="mesh" mesh="handle" mass='0.01' rgba='0.7 0.7 0.0 1' />
+        </body>
+        <!-- Rubber Pad-->
+        <body name="y_mid_rod_r_rubber" pos="0 0 -33.695" euler="0 0 90">
+          <inertial pos="0 0 0" quat="1 0 0 0" mass="0.05" diaginertia="0.00179 0.00179 0.00306"/>
+          <geom name="y_mid_rod_r_rubber" type="cylinder" friction="0.1" size="1.5875 1.27" pos="0 0 0" rgba="0.0 0.0 0.0 1"/>
+        </body>
+        <body name="y_mid_rod_l_rubber" pos="0 0 19.92" euler="0 0 90">
+          <inertial pos="0 0 0" quat="1 0 0 0" mass="0.05" diaginertia="0.00179 0.00179 0.00306"/>
+          <geom name="y_mid_rod_l_rubber" type="cylinder" friction="0.1" size="1.5875 1.27" pos="0 0 0" rgba="0.0 0.0 0.0 1"/>
+        </body>
+        <!-- 5 Yellow Players -->
+        <body name="y_mid_guy1" pos="1.5 0 -30.837" euler="180 -90 0">
+          <!-- <inertial pos="0.004145 0.080444 -0.000002" quat="1 0 0 0" mass="0.38576930594052466" 
+          diaginertia="0.132288404 0.017566716 0.132398588"/> -->
+          <geom type="sdf" name="y_mid_guy1" mesh="guy" mass="0.07" density="1000" 
+                  rgba="0.95 0.95 0.0 1">
+              <plugin instance="sdf2"/>
+          </geom>
+        </body>
+        <body name="y_mid_guy2" pos="1.5 0 -18.862" euler="180 -90 0">
+          <!-- <inertial pos="0.004145 0.080444 -0.000002" quat="1 0 0 0" mass="0.38576930594052466" 
+          diaginertia="0.132288404 0.017566716 0.132398588"/> -->
+          <geom type="sdf" name="y_mid_guy2" mesh="guy" mass="0.07" density="1000" 
+                  rgba="0.95 0.95 0.0 1">
+              <plugin instance="sdf2"/>
+          </geom>
+        </body>
+        <body name="y_mid_guy3" pos="1.5 0 -6.887" euler="180 -90 0">
+          <!-- <inertial pos="0.004145 0.080444 -0.000002" quat="1 0 0 0" mass="0.38576930594052466" 
+          diaginertia="0.132288404 0.017566716 0.132398588"/> -->
+          <geom type="sdf" name="y_mid_guy3" mesh="guy" mass="0.07" density="1000" 
+                  rgba="0.95 0.95 0.0 1">
+              <plugin instance="sdf2"/>
+          </geom>
+        </body>
+        <body name="y_mid_guy4" pos="1.5 0 5.088" euler="180 -90 0">
+          <!-- <inertial pos="0.004145 0.080444 -0.000002" quat="1 0 0 0" mass="0.38576930594052466" 
+          diaginertia="0.132288404 0.017566716 0.132398588"/> -->
+          <geom type="sdf" name="y_mid_guy4" mesh="guy" mass="0.07" density="1000" 
+                  rgba="0.95 0.95 0.0 1">
+              <plugin instance="sdf2"/>
+          </geom>
+        </body>
+        <body name="y_mid_guy5" pos="1.5 0 17.063" euler="180 -90 0">
+          <!-- <inertial pos="0.004145 0.080444 -0.000002" quat="1 0 0 0" mass="0.38576930594052466" 
+          diaginertia="0.132288404 0.017566716 0.132398588"/> -->
+          <geom type="sdf" name="y_mid_guy5" mesh="guy" mass="0.07" density="1000" 
+                  rgba="0.95 0.95 0.0 1">
+              <plugin instance="sdf2"/>
+          </geom>
+        </body>
+      </body>
+
+
+      <!-- MATCH BALL-->
+      
+      <!-- <body name="guy" pos="0 -3 2.0" euler="180 -90 0">
+        <freejoint/>
+        <geom type="sdf" name="guy" mesh="guy" mass="0.4" friction="5 0.5 0.2" rgba="0.95 0.1 0.0 1">
+          <plugin instance="sdf2"/>
+        </geom>
+      </body> -->
+
+      <body name="ball" pos="12 -4 1.705">
+        <joint name="ball_x" type="slide" axis="1 0 0"  frictionloss="5"/>
+        <joint name="ball_y" type="slide" axis="0 1 0" frictionloss="5"/>
+        <!-- <freejoint/> -->
+        <geom name="ball" type="sphere" size="1.73355" mass="0.1" rgba="0.8 0.3 0.5 1"
+              friction="0.01 0.1 10"  />
+      </body>
+
+    </worldbody>
+  
+
+    <!-- exclude the contact between the rods and the table -->
+    <contact>
+
+
+
+      <exclude body1="y_mid_rod" body2="table"/>
+
+      <exclude body1="y_mid_rod_handle" body2="table"/>
+
+
+
+      <exclude body1="table_side_rubber_y_mid_r" body2="y_mid_rod"/>
+      <exclude body1="table_side_rubber_y_mid_l" body2="y_mid_rod"/>
+
+
+
+    </contact>
+  
+
+  <!-- Adjust the controller parameters (e.g., kp, kv) to replicate the simulated motion in the real-world environment, as physical dynamics may differ -->    
+  <actuator>
+      <position name="y_mid_linear" joint="y_mid_linear" ctrlrange="-7.0 7.0" kp="10000" kv="200" /> 
+      <position name="y_mid_rotation" joint="y_mid_rotation" ctrlrange="-2.5 2.5" kp="10000" kv="500" />
+    
+    </actuator>
+
+
+  </mujoco>
+  

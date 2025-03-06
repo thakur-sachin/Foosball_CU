@@ -1,0 +1,175 @@
+<mujoco>
+    <compiler texturedir="asset"/>
+  
+    <statistic meansize=".05"/>
+  
+    <!-- <visual>
+      <rgba haze="0.15 0.25 0.35 1"/>
+      <map stiffness="700"  fogstart="1" fogend="15" zfar="40" haze="1" shadowclip="3"/>
+    </visual> -->
+
+    <default>
+      <geom solref="0.004 1" solimp=".99 .99 .00001"  condim="4"/>
+    </default>
+  
+
+    <asset>
+      <texture name="field_pattern" type="2d" file="field.png"/>
+      <material name="field" texture="field_pattern"/>
+
+      <texture name="black_color" type="2d" file="black.png"/>
+      <material name="black" texture="black_color"/>
+
+      <mesh name="outside_rubber" file="asset/outside_rubber/table_outside_rubber.obj" scale='0.1 0.1 0.1'/>
+    </asset>
+  
+    <worldbody>
+      <light directional="true"  specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1"/>
+
+      <body name="background" pos="0 0 -5" euler="0 0 0">
+        <geom type="plane" size="500 500 .01" rgba="1.0 1.0 1.0 1.0" contype="0" conaffinity="0"/>
+      </body>
+
+      <body name="ground" pos="0 0 -0.03" euler="0 0 180">
+        <geom type="plane" size="35 63 0.01" material="field" friction="0.01 0.1 10"/>
+      </body>
+
+    <!-- Table's inside rubber pads -->
+      <body name="table_side_rubber_y_goal_r">
+        <geom type="cylinder" pos="-33.75 -52.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_goal_l">
+        <geom type="cylinder" pos="33.75 -52.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_def_r">
+        <geom type="cylinder" pos="-33.75 -37.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_def_l">
+        <geom type="cylinder" pos="33.75 -37.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_mid_r">
+        <geom type="cylinder" pos="-33.75 -7.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_mid_l">
+        <geom type="cylinder" pos="33.75 -7.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_attack_r">
+        <geom type="cylinder" pos="-33.75 22.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_y_attack_l">
+        <geom type="cylinder" pos="33.75 22.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+
+      <body name="table_side_rubber_b_goal_r">
+        <geom type="cylinder" pos="-33.75 52.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_goal_l">
+        <geom type="cylinder" pos="33.75 52.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_def_r">
+        <geom type="cylinder" pos="-33.75 37.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_def_l">
+        <geom type="cylinder" pos="33.75 37.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_mid_r">
+        <geom type="cylinder" pos="-33.75 7.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_mid_l">
+        <geom type="cylinder" pos="33.75 7.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_attack_r">
+        <geom type="cylinder" pos="-33.75 -22.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+      <body name="table_side_rubber_b_attack_l">
+        <geom type="cylinder" pos="33.75 -22.5 7.75" euler="90 90 0" size="2.4 0.25"
+              contype="5" conaffinity="5" rgba='0.05 0.05 0.05 1' friction="0.01" group="2"/>
+      </body>
+
+    <!-- Table's outside rubber pads -->
+      <body name="outside_rubber_y_goal_r" pos="-38.35 -52.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_goal_l" pos="38.35 -52.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_def_r" pos="-38.35 -37.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_def_l" pos="38.35 -37.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_mid_r" pos="-38.35 -7.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_mid_l" pos="38.35 -7.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_attack_r" pos="-38.35 22.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_y_attack_l" pos="38.35 22.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+
+      <body name="outside_rubber_b_goal_r" pos="-38.35 52.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_goal_l" pos="38.35 52.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_def_r" pos="-38.35 37.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_def_l" pos="38.35 37.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_mid_r" pos="-38.35 7.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_mid_l" pos="38.35 7.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_attack_r" pos="-38.35 -22.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+      <body name="outside_rubber_b_attack_l" pos="38.35 -22.5 7.75" euler="0 0 90">
+        <geom contype="0" conaffinity="0" type="mesh" mesh="outside_rubber" rgba='0.05 0.05 0.05 1' group="2"></geom>
+      </body>
+
+    <!-- Table serface painting -->
+      <body name="table_surface_1">
+        <geom type="plane" pos="0 -65.6 11.15" size="38.1 5.5 0.01"
+              contype="0" conaffinity="0" rgba='0.05 0.05 0.05 1' group="2"/>
+      </body>
+      <body name="table_surface_2">
+        <geom type="plane" pos="0 65.6 11.15" size="38.1 5.5 0.01"
+              contype="0" conaffinity="0" rgba='0.05 0.05 0.05 1' group="2"/>
+      </body>
+      <body name="table_surface_3">
+        <geom type="plane" pos="-36.05 0 11.15" size="2.05 60.1 0.01"
+              contype="0" conaffinity="0" rgba='0.05 0.05 0.05 1' group="2"/>
+      </body>
+      <body name="table_surface_4">
+        <geom type="plane" pos="36.05 0 11.15" size="2.05 60.1 0.01"
+              contype="0" conaffinity="0" rgba='0.05 0.05 0.05 1' group="2"/>
+      </body>
+
+    </worldbody>
+  </mujoco>
+  
