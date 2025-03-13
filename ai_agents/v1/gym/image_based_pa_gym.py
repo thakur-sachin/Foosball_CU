@@ -34,7 +34,7 @@ class CameraConfig:
         self.lookat = lookat if lookat is not None else [0.0, 0.0, 0.5]
         self.tracking_point = tracking_point
 
-class FoosballEnv(MujocoTableRenderMixin, gym.Env):
+class FoosballEnv(gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
     def __init__(
@@ -252,6 +252,63 @@ class FoosballEnv(MujocoTableRenderMixin, gym.Env):
             print(f"Terminated: Unhealthy: {unhealthy}, No progress: {no_progress}, Victory: {victory}, Ball stagnant: {ball_stagnant}")
 
         return terminated
+
+    def render(self, mode='human'):
+        if self.viewer is None:
+            if not glfw.init():
+                raise Exception("Could not initialize GLFW")
+
+            self.window = glfw.create_window(800, 600, "Foosball Simulation", None, None)
+            if not self.window:
+                glfw.terminate()
+                raise Exception("Could not create GLFW window")
+
+            glfw.make_context_current(self.window)
+
+            self.cam = mujoco.MjvCamera()
+            mujoco.mjv_defaultCamera(self.cam)
+            self.cam.azimuth = 180.0
+            self.cam.elevation = -70.0
+            self.cam.distance = 25.0
+            self.cam.lookat[:] = np.array([2, 0, 0])
+
+            self.opt = mujoco.MjvOption()
+            mujoco.mjv_defaultOption(self.opt)
+            self.scn = mujoco.MjvScene(self.model, maxgeom=1000)
+
+            self.ctx = mujoco.MjrContext(
+                self.model, mujoco.mjtFontScale.mjFONTSCALE_150
+            )
+
+            self.viewer = True  # Flag to indicate that the viewer is initialized
+
+        if not glfw.window_should_close(self.window):
+            mujoco.mjv_updateScene(
+                self.model,
+                self.data,
+                self.opt,
+                None,
+                self.cam,
+                mujoco.mjtCatBit.mjCAT_ALL,  # 'catmask' argument
+                self.scn
+            )
+
+            viewport_width, viewport_height = glfw.get_framebuffer_size(self.window)
+            viewport = mujoco.MjrRect(0, 0, viewport_width, viewport_height)
+
+            mujoco.mjr_render(viewport, self.scn, self.ctx)
+
+            glfw.swap_buffers(self.window)
+            glfw.poll_events()
+        else:
+            self.close()
+
+    def close(self):
+        if self.viewer is not None:
+            glfw.destroy_window(self.window)
+            glfw.terminate()
+            self.viewer = None
+
 
     def render(self, mode='human'):
         if self.viewer is None:

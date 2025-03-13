@@ -2,7 +2,7 @@ import mujoco
 from mujoco import viewer
 import argparse
 
-DEFAULT_PATH = "/Research/Foosball_CU/foosball_sim/v1/foosball_sim.xml"
+DEFAULT_PATH = "/Research/Foosball_CU/foosball_sim/v2/foosball_sim.xml"
 
 def main():
     arg_parser = argparse.ArgumentParser()

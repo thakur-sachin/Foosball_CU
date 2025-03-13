@@ -5,14 +5,16 @@ import mujoco
 import os
 import glfw
 
-from ai_agents.v1.gym.mujoco_table_render_mixin import MujocoTableRenderMixin
+from ai_agents.v2.gym.mujoco_table_render_mixin import MujocoTableRenderMixin
 
 DIRECTION_CHANGE = 1
 TABLE_MAX_Y_DIM = 10
 BALL_STOPPED_COUNT_THRESHOLD = 100
-SIM_PATH = os.environ.get('SIM_PATH', '/Research/Foosball_CU/foosball_sim/v1/foosball_sim.xml')
+SIM_PATH = os.environ.get('SIM_PATH', '/Research/Foosball_CU/foosball_sim/v2/foosball_sim.xml')
 
-class FoosballEnv( gym.Env):
+RODS = ["_goal_", "_def_", "_mid_", "_attack_"]
+
+class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
     def __init__(self, antagonist_model=None, play_until_goal=False, verbose_mode=False):
@@ -34,8 +36,26 @@ class FoosballEnv( gym.Env):
         self.antagonist_action_size = self.num_rods_per_player * 2   # 8 actions for antagonist
 
         action_high = np.ones(self.protagonist_action_size)
+        self.rotation_action_space = spaces.Box(
+            low=-2.5 * action_high, high=2.5 * action_high, dtype=np.float32
+        )
+
+        self.goal_linear_action_space = spaces.Box(
+            low=-10.0 * action_high, high=10.0 * action_high, dtype=np.float32
+        )
+        self.def_linear_action_space = spaces.Box(
+            low=-20.0 * action_high, high=20.0 * action_high, dtype=np.float32
+        )
+        self.mid_linear_action_space = spaces.Box(
+            low=-7.0 * action_high, high=7.0 * action_high, dtype=np.float32
+        )
+        self.attack_linear_action_space = spaces.Box(
+            low=-12.0 * action_high, high=12.0 * action_high, dtype=np.float32
+        )
+
+        # TEMP
         self.action_space = spaces.Box(
-            low=-3.5 * action_high, high=3.5 * action_high, dtype=np.float32
+            low=-20 * action_high, high=20 * action_high, dtype=np.float32
         )
 
         obs_dim = 38
@@ -66,16 +86,22 @@ class FoosballEnv( gym.Env):
         super().reset(seed=seed)
         mujoco.mj_resetData(self.model, self.data)
 
-        ball_joint_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint')
-        qpos_adr = self.model.jnt_qposadr[ball_joint_id]
+        ball_x_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_x')
+        ball_y_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_y')
 
-        # Randomize ball position at reset
-        self.data.qpos[qpos_adr:qpos_adr + 3] = np.random.normal(
-            loc=[-0.5, 0.0, 0.55], scale=[0.5, 0.5, 0.0]
+        x_qpos_adr = self.model.jnt_qposadr[ball_x_id]
+        y_qpos_adr = self.model.jnt_qposadr[ball_y_id]
+
+        xy_random = np.random.normal(
+            loc=[-0.5, 0.0],
+            scale=[0.5, 0.5]
         )
 
+        self.data.qpos[x_qpos_adr] = xy_random[0]
+        self.data.qpos[y_qpos_adr] = xy_random[1]
+
         self.simulation_time = 0
-        self.prev_ball_y = self.data.qpos[qpos_adr + 1]
+        self.prev_ball_y = self.data.qpos[y_qpos_adr]
         self.no_progress_steps = 0
         self.ball_stopped_count = 0
 
@@ -109,12 +135,33 @@ class FoosballEnv( gym.Env):
 
         return obs, reward, terminated, False, info
 
+    def _get_ball_obs(self):
+        ball_x_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_x')
+        ball_y_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_y')
+        ball_z_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_z')
+        x_qpos_adr = self.model.jnt_qposadr[ball_x_id]
+        y_qpos_adr = self.model.jnt_qposadr[ball_y_id]
+        x_qvel_adr = self.model.jnt_dofadr[ball_x_id]
+        y_qvel_adr = self.model.jnt_dofadr[ball_y_id]
+        z_qvel_adr = self.model.jnt_dofadr[ball_z_id]
+        ball_pos = [
+            self.data.qpos[x_qpos_adr],
+            self.data.qpos[y_qpos_adr],
+            self.data.qpos[ball_z_id]
+        ]
+        ball_vel = [
+            self.data.qvel[x_qvel_adr],
+            self.data.qvel[y_qvel_adr],
+            self.data.qvel[z_qvel_adr]
+        ]
+
+        return ball_pos, ball_vel
+
+    def _get_antagonist_obs(self):
+        return None
+
     def _get_obs(self):
-        ball_joint_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint')
-        qpos_adr = self.model.jnt_qposadr[ball_joint_id]
-        qvel_adr = self.model.jnt_dofadr[ball_joint_id]
-        ball_pos = self.data.qpos[qpos_adr:qpos_adr + 3]
-        ball_vel = self.data.qvel[qvel_adr:qvel_adr + 3]
+        ball_pos, ball_vel = self._get_ball_obs()
 
         rod_slide_positions = []
         rod_slide_velocities = []
@@ -122,10 +169,10 @@ class FoosballEnv( gym.Env):
         rod_rotate_velocities = []
 
         # Collect observations for both players' rods
-        for player in ['A', 'B']:
-            for i in range(1, 5):
+        for player in ['y', 'b']:
+            for rod in RODS:
                 # Linear joints
-                slide_joint_name = f'lin_{player}_{i}'
+                slide_joint_name = f"{player}{rod}linear"
                 slide_joint_id = mujoco.mj_name2id(
                     self.model, mujoco.mjtObj.mjOBJ_JOINT, slide_joint_name
                 )
@@ -135,7 +182,7 @@ class FoosballEnv( gym.Env):
                 rod_slide_velocities.append(self.data.qvel[slide_qvel_adr])
 
                 # Rotational joints
-                rotate_joint_name = f'rev_{player}_{i}'
+                rotate_joint_name = f"{player}{rod}rotation"
                 rotate_joint_id = mujoco.mj_name2id(
                     self.model, mujoco.mjtObj.mjOBJ_JOINT, rotate_joint_name
                 )
@@ -159,90 +206,6 @@ class FoosballEnv( gym.Env):
 
         return obs
 
-    def _get_antagonist_obs(self):
-        """
-        Get the observation for the antagonist (Player B).
-        Includes positions and velocities of both Player B's and Player A's rods.
-        Adjusts the observations to match the antagonist's perspective.
-        """
-        # Ball position and velocity
-        ball_joint_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint')
-        qpos_adr = self.model.jnt_qposadr[ball_joint_id]
-        qvel_adr = self.model.jnt_dofadr[ball_joint_id]
-
-        # Get ball position and velocity
-        ball_pos = self.data.qpos[qpos_adr:qpos_adr + 3].copy()
-        ball_vel = self.data.qvel[qvel_adr:qvel_adr + 3].copy()
-
-        # Reverse the x-coordinate to mirror the ball position and velocity
-        ball_pos[0] *= -1
-        ball_vel[0] *= -1
-
-        rod_slide_positions = []
-        rod_slide_velocities = []
-        rod_rotate_positions = []
-        rod_rotate_velocities = []
-
-        # Collect observations for both players' rods, adjusting for antagonist's perspective
-        for player in ['B', 'A']:  # Note the order: antagonist's rods first
-            for i in range(1, 5):
-                # Linear joints
-                slide_joint_name = f'lin_{player}_{i}'
-                slide_joint_id = mujoco.mj_name2id(
-                    self.model, mujoco.mjtObj.mjOBJ_JOINT, slide_joint_name
-                )
-                slide_qpos_adr = self.model.jnt_qposadr[slide_joint_id]
-                slide_qvel_adr = self.model.jnt_dofadr[slide_joint_id]
-                slide_pos = self.data.qpos[slide_qpos_adr]
-                slide_vel = self.data.qvel[slide_qvel_adr]
-
-                if player == 'A':
-                    # Reverse positions and velocities for opponent's rods
-                    slide_pos = -slide_pos
-                    slide_vel = -slide_vel
-
-                else:
-                    # For own rods, reverse as necessary to match training perspective
-                    slide_pos = -slide_pos
-                    slide_vel = -slide_vel
-
-                rod_slide_positions.append(slide_pos)
-                rod_slide_velocities.append(slide_vel)
-
-                # Rotational joints
-                rotate_joint_name = f'rev_{player}_{i}'
-                rotate_joint_id = mujoco.mj_name2id(
-                    self.model, mujoco.mjtObj.mjOBJ_JOINT, rotate_joint_name
-                )
-                rotate_qpos_adr = self.model.jnt_qposadr[rotate_joint_id]
-                rotate_qvel_adr = self.model.jnt_dofadr[rotate_joint_id]
-                rotate_pos = self.data.qpos[rotate_qpos_adr]
-                rotate_vel = self.data.qvel[rotate_qvel_adr]
-
-                if player == 'A':
-                    # Reverse positions and velocities for opponent's rods
-                    rotate_pos = -rotate_pos
-                    rotate_vel = -rotate_vel
-
-                else:
-                    # For own rods, reverse as necessary to match training perspective
-                    rotate_pos = -rotate_pos
-                    rotate_vel = -rotate_vel
-
-                rod_rotate_positions.append(rotate_pos)
-                rod_rotate_velocities.append(rotate_vel)
-
-        antagonist_obs = np.concatenate([
-            ball_pos,
-            ball_vel,
-            rod_slide_positions,
-            rod_slide_velocities,
-            rod_rotate_positions,
-            rod_rotate_velocities
-        ])
-
-        return antagonist_obs
-
     def _adjust_antagonist_action(self, antagonist_action):
         adjusted_action = -antagonist_action.copy()
 
@@ -252,11 +215,7 @@ class FoosballEnv( gym.Env):
         """
         Compute the reward for the protagonist (Player A).
         """
-        ball_joint_id = mujoco.mj_name2id(
-            self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint'
-        )
-        qpos_adr = self.model.jnt_qposadr[ball_joint_id]
-        ball_y = self.data.qpos[qpos_adr + 1]
+        ball_y = self._get_ball_obs()[0][1]
 
         if self.prev_ball_y is not None:
             progress = (ball_y - self.prev_ball_y) * DIRECTION_CHANGE
@@ -298,11 +257,7 @@ class FoosballEnv( gym.Env):
 
     @property
     def is_healthy(self):
-        ball_joint_id = mujoco.mj_name2id(
-            self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint'
-        )
-        qpos_adr = self.model.jnt_qposadr[ball_joint_id]
-        ball_z = self.data.qpos[qpos_adr + 2]
+        ball_z = self._get_ball_obs()[0][2]
 
         min_z, max_z = self._healthy_z_range
         is_healthy = min_z < ball_z < max_z
@@ -310,11 +265,7 @@ class FoosballEnv( gym.Env):
         return is_healthy
 
     def _is_ball_moving(self):
-        ball_joint_id = mujoco.mj_name2id(
-            self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint'
-        )
-        qvel_adr = self.model.jnt_dofadr[ball_joint_id]
-        ball_vel = self.data.qvel[qvel_adr:qvel_adr + 3]
+        ball_pos, ball_vel = self._get_ball_obs()
 
         return np.linalg.norm(ball_vel) > 0.5
 
@@ -326,12 +277,9 @@ class FoosballEnv( gym.Env):
         unhealthy = not self.is_healthy
         no_progress = self.no_progress_steps >= self.max_no_progress_steps
 
-        ball_joint_id = mujoco.mj_name2id(
-            self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_free_joint'
-        )
-        qpos_adr = self.model.jnt_qposadr[ball_joint_id]
-        ball_y = self.data.qpos[qpos_adr + 1]
-        ball_x = self.data.qpos[qpos_adr]
+        ball_y = self._get_ball_obs()[0][1]
+        ball_x = self._get_ball_obs()[0][0]
+
         victory = ball_y < -1 * TABLE_MAX_Y_DIM or ball_y > TABLE_MAX_Y_DIM  # Ball in any goal
 
         terminated = (
