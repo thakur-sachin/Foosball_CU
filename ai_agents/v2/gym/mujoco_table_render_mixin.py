@@ -10,23 +10,6 @@ class MujocoTableRenderMixin():
         self.viewer = None
         self.window = None
         self._initialize_glfw()
-
-    def _initialize_glfw(self):
-        if not glfw.init():
-            raise Exception("Could not initialize GLFW")
-
-import numpy as np
-import mujoco
-import glfw
-import time
-
-class MujocoTableRenderMixin():
-    metadata = {'render.modes': ['human', 'rgb_array']}
-
-    def __init__(self):
-        self.viewer = None
-        self.window = None
-        self._initialize_glfw()
         self.first_render = True
 
     def _initialize_glfw(self):

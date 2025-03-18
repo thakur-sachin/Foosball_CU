@@ -23,8 +23,8 @@ if __name__ == '__main__':
 
     model_dir = './models'
     log_dir = './logs'
-    total_epochs = 10
-    epoch_timesteps = int(1e8)
+    total_epochs = 15
+    epoch_timesteps = int(100000)
 
     agent_manager = GenericAgentManager(1, sac_foosball_env_factory, SACFoosballAgent)
     agent_manager.initialize_training_agents()

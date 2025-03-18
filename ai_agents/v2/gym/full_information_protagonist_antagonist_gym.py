@@ -8,8 +8,9 @@ import glfw
 from ai_agents.v2.gym.mujoco_table_render_mixin import MujocoTableRenderMixin
 
 DIRECTION_CHANGE = 1
-TABLE_MAX_Y_DIM = 10
-BALL_STOPPED_COUNT_THRESHOLD = 100
+TABLE_MAX_Y_DIM = 70
+BALL_STOPPED_COUNT_THRESHOLD = 20
+MAX_STEPS = 50
 SIM_PATH = os.environ.get('SIM_PATH', '/Research/Foosball_CU/foosball_sim/v2/foosball_sim.xml')
 
 RODS = ["_goal_", "_def_", "_mid_", "_attack_"]
@@ -68,8 +69,8 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         self._healthy_reward = 1.0
         self._ctrl_cost_weight = 0.1
         self._terminate_when_unhealthy = True
-        self._healthy_z_range = (-10, 10)
-        self.max_no_progress_steps = 600
+        self._healthy_z_range = (-80, 80)
+        self.max_no_progress_steps = 20
 
         self.prev_ball_y = None
         self.no_progress_steps = 0
@@ -217,30 +218,12 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         """
         ball_y = self._get_ball_obs()[0][1]
 
-        if self.prev_ball_y is not None:
-            progress = (ball_y - self.prev_ball_y) * DIRECTION_CHANGE
-        else:
-            progress = 0.0
-        self.prev_ball_y = ball_y
-
-        if abs(progress) <= 0.01:
-            self.no_progress_steps += 1
-        else:
-            self.no_progress_steps = 0
-
-        progress_reward = progress * 10.0
-
-        healthy_reward = self.healthy_reward
         ctrl_cost = self.control_cost(protagonist_action)
 
-        victory = -10000 * DIRECTION_CHANGE if ball_y < -1 *  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
-        loss = 10000 * DIRECTION_CHANGE if ball_y > TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
+        victory = 10000 * DIRECTION_CHANGE if ball_y >  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
+        loss = -10000 * DIRECTION_CHANGE if ball_y < -1.0 * TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
 
-        progress_penalty = -100 if self.no_progress_steps >= 10 else 0
-
-        continuation_reward = 110
-
-        reward = loss + victory + progress_reward + healthy_reward + progress_penalty + continuation_reward
+        reward = loss + victory +  ctrl_cost + ball_y
 
         return reward
 
@@ -252,7 +235,15 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         )
 
     def control_cost(self, action):
-        control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
+        # 2-norm
+        #control_cost = self._ctrl_cost_weight * np.sum(np.square(action)) * -1.0
+
+        # 1-norm
+        control_cost = self._ctrl_cost_weight * np.sum(np.abs(action)) * -1.0
+
+        # L0 norm
+        #control_cost = self._ctrl_cost_weight * np.count_nonzero(action) * -1.0
+
         return control_cost
 
     @property
@@ -269,10 +260,25 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
 
         return np.linalg.norm(ball_vel) > 0.5
 
+    def _determine_progression(self):
+        ball_y = self._get_ball_obs()[0][1]
+
+        if self.prev_ball_y is not None:
+            if ball_y > self.prev_ball_y:
+                self.no_progress_steps = 0
+            else:
+                self.no_progress_steps += 1
+
+        self.prev_ball_y = ball_y
+
     @property
     def terminated(self):
+        self._determine_progression()
+
         self.ball_stopped_count = 0 if self._is_ball_moving() else self.ball_stopped_count + 1
         ball_stagnant = self.ball_stopped_count >= BALL_STOPPED_COUNT_THRESHOLD
+
+        over_max_steps = self.simulation_time >= MAX_STEPS
 
         unhealthy = not self.is_healthy
         no_progress = self.no_progress_steps >= self.max_no_progress_steps
@@ -282,8 +288,12 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
 
         victory = ball_y < -1 * TABLE_MAX_Y_DIM or ball_y > TABLE_MAX_Y_DIM  # Ball in any goal
 
+        if victory:
+            print("Victory")
+            print(f"Ball x: {ball_x}, Ball y: {ball_y}")
+
         terminated = (
-                unhealthy or (no_progress and not self.play_until_goal) or victory or ball_stagnant
+                unhealthy or (no_progress and not self.play_until_goal) or victory or ball_stagnant or over_max_steps
         ) if self._terminate_when_unhealthy else False
 
         if self.verbose_mode and terminated:
@@ -291,62 +301,3 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
             print(f"Unhealthy: {unhealthy}, No progress: {no_progress}, Victory: {victory}, Ball stagnant: {ball_stagnant}")
             print("x: ", ball_x, "y: ", ball_y)
         return terminated
-
-    def seed(self, seed=None):
-        np.random.seed(seed)
-
-        def render(self, mode='human'):
-            if self.viewer is None:
-                if not glfw.init():
-                    raise Exception("Could not initialize GLFW")
-
-                self.window = glfw.create_window(800, 600, "Foosball Simulation", None, None)
-                if not self.window:
-                    glfw.terminate()
-                    raise Exception("Could not create GLFW window")
-
-                glfw.make_context_current(self.window)
-
-                self.cam = mujoco.MjvCamera()
-                mujoco.mjv_defaultCamera(self.cam)
-                self.cam.azimuth = 180.0
-                self.cam.elevation = -70.0
-                self.cam.distance = 25.0
-                self.cam.lookat[:] = np.array([2, 0, 0])
-
-                self.opt = mujoco.MjvOption()
-                mujoco.mjv_defaultOption(self.opt)
-                self.scn = mujoco.MjvScene(self.model, maxgeom=1000)
-
-                self.ctx = mujoco.MjrContext(
-                    self.model, mujoco.mjtFontScale.mjFONTSCALE_150
-                )
-
-                self.viewer = True  # Flag to indicate that the viewer is initialized
-
-        if not glfw.window_should_close(self.window):
-            mujoco.mjv_updateScene(
-                self.model,
-                self.data,
-                self.opt,
-                None,
-                self.cam,
-                mujoco.mjtCatBit.mjCAT_ALL,  # 'catmask' argument
-                self.scn
-            )
-
-            viewport_width, viewport_height = glfw.get_framebuffer_size(self.window)
-            viewport = mujoco.MjrRect(0, 0, viewport_width, viewport_height)
-
-            mujoco.mjr_render(viewport, self.scn, self.ctx)
-
-            glfw.swap_buffers(self.window)
-            glfw.poll_events()
-        else:
-            self.close()
-
-    def close(self):
-        if self.viewer is not None:
-            glfw.destroy_window(self.window)
-            glfw.terminate()
-            self.viewer = None
