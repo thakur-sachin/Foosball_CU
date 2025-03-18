@@ -1,12 +1,14 @@
+import os
+
 import mujoco
 from mujoco import viewer
 import argparse
 
-DEFAULT_PATH = "/Research/Foosball_CU/foosball_sim/v2/foosball_sim.xml"
+SIM_PATH = os.environ.get('SIM_PATH', '/Research/Foosball_CU/foosball_sim/v2/foosball_sim.xml')
 
 def main():
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--xml_file_path", type=str, default=DEFAULT_PATH)
+    arg_parser.add_argument("--xml_file_path", type=str, default=SIM_PATH)
 
     args = arg_parser.parse_args()
     xml_file_path = args.xml_file_path

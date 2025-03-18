@@ -217,14 +217,14 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         Compute the reward for the protagonist (Player A).
         """
         ball_y = self._get_ball_obs()[0][1]
-        ball_x = (self._get_ball_obs()[0][0] ** 2) * -2.0
+        ball_x =
 
         ctrl_cost = self.control_cost(protagonist_action)
 
         victory = 10000 * DIRECTION_CHANGE if ball_y >  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
         loss = -10000 * DIRECTION_CHANGE if ball_y < -1.0 * TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
 
-        reward = loss + victory +  ctrl_cost + ball_y + ball_x
+        reward = loss + victory +  ctrl_cost + ball_y
 
         return reward
 
