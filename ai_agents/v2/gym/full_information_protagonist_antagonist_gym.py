@@ -1,3 +1,5 @@
+import math
+
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
@@ -8,9 +10,9 @@ import glfw
 from ai_agents.v2.gym.mujoco_table_render_mixin import MujocoTableRenderMixin
 
 DIRECTION_CHANGE = 1
-TABLE_MAX_Y_DIM = 70
-BALL_STOPPED_COUNT_THRESHOLD = 20
-MAX_STEPS = 50
+TABLE_MAX_Y_DIM = 65
+BALL_STOPPED_COUNT_THRESHOLD = 10
+MAX_STEPS = 40
 SIM_PATH = os.environ.get('SIM_PATH', '/Research/Foosball_CU/foosball_sim/v2/foosball_sim.xml')
 
 RODS = ["_goal_", "_def_", "_mid_", "_attack_"]
@@ -67,10 +69,10 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         self.viewer = None
 
         self._healthy_reward = 1.0
-        self._ctrl_cost_weight = 0.1
+        self._ctrl_cost_weight = 0.005
         self._terminate_when_unhealthy = True
         self._healthy_z_range = (-80, 80)
-        self.max_no_progress_steps = 20
+        self.max_no_progress_steps = 15
 
         self.prev_ball_y = None
         self.no_progress_steps = 0
@@ -142,13 +144,14 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         ball_z_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'ball_z')
         x_qpos_adr = self.model.jnt_qposadr[ball_x_id]
         y_qpos_adr = self.model.jnt_qposadr[ball_y_id]
+        z_qpos_adr = self.model.jnt_qposadr[ball_z_id]
         x_qvel_adr = self.model.jnt_dofadr[ball_x_id]
         y_qvel_adr = self.model.jnt_dofadr[ball_y_id]
         z_qvel_adr = self.model.jnt_dofadr[ball_z_id]
         ball_pos = [
             self.data.qpos[x_qpos_adr],
             self.data.qpos[y_qpos_adr],
-            self.data.qpos[ball_z_id]
+            self.data.qpos[z_qpos_adr]
         ]
         ball_vel = [
             self.data.qvel[x_qvel_adr],
@@ -212,19 +215,30 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
 
         return adjusted_action
 
+
+    def euclidean_goal_distance(self, x, y):
+        # Point (0, 64)
+        return math.sqrt((x - 0) ** 2 + (y - TABLE_MAX_Y_DIM) ** 2)
+
     def compute_reward(self, protagonist_action):
         """
         Compute the reward for the protagonist (Player A).
         """
-        ball_y = self._get_ball_obs()[0][1]
-        ball_x = (self._get_ball_obs()[0][0] ** 2) * -2.0
+        ball_obs = self._get_ball_obs()
+        ball_y = ball_obs[0][1]
+        ball_x = ball_obs[0][0]
+
+        inverse_distance_to_goal = 300 - self.euclidean_goal_distance(ball_x, ball_y)
+
+        if ball_y >  TABLE_MAX_Y_DIM:
+            inverse_distance_to_goal = 0
 
         ctrl_cost = self.control_cost(protagonist_action)
 
-        victory = 10000 * DIRECTION_CHANGE if ball_y >  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
-        loss = -10000 * DIRECTION_CHANGE if ball_y < -1.0 * TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
+        victory = 1000 * DIRECTION_CHANGE if ball_y >  TABLE_MAX_Y_DIM else 0  # Ball in antagonist's goal
+        loss = -1000 * DIRECTION_CHANGE if ball_y < -1.0 * TABLE_MAX_Y_DIM else 0  # Ball in protagonist's goal
 
-        reward = loss + victory +  ctrl_cost + ball_y + ball_x
+        reward = loss + victory + inverse_distance_to_goal
 
         return reward
 
@@ -294,7 +308,7 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
             print(f"Ball x: {ball_x}, Ball y: {ball_y}")
 
         terminated = (
-                unhealthy or (no_progress and not self.play_until_goal) or victory or ball_stagnant or over_max_steps
+                unhealthy or (no_progress and not self.play_until_goal) or ball_stagnant or over_max_steps #or victory
         ) if self._terminate_when_unhealthy else False
 
         if self.verbose_mode and terminated:

@@ -4,7 +4,7 @@ from stable_baselines3.common.callbacks import EvalCallback
 
 
 class SACFoosballAgent(FoosballAgent):
-    def __init__(self, id:int, env=None, log_dir='./logs', model_dir='./models', policy_kwargs = dict(net_arch=[2024, 2024, 2024, 2024, 2024])):
+    def __init__(self, id:int, env=None, log_dir='./logs', model_dir='./models', policy_kwargs = dict(net_arch=[3000, 3000, 3000, 3000, 3000, 3000, 3000])):
         self.env = env
         self.model = None
         self.id = id
@@ -21,7 +21,7 @@ class SACFoosballAgent(FoosballAgent):
             self.load()
         except Exception as e:
             print(f"Agent {self.id} could not load model. Initializing new model.")
-            self.model = SAC('MlpPolicy', self.env, policy_kwargs=self.policy_kwargs, device='cuda', buffer_size=10000)
+            self.model = SAC('MlpPolicy', self.env, policy_kwargs=self.policy_kwargs, device='cuda', buffer_size=1000000)
         print(f"Agent {self.id} initialized.")
 
     def predict(self, observation, deterministic=False):
@@ -32,7 +32,7 @@ class SACFoosballAgent(FoosballAgent):
 
     def learn(self, total_timesteps):
         if self.model is None:
-            self.model = SAC('MlpPolicy', self.env, policy_kwargs=self.policy_kwargs, buffer_size=10000)
+            self.model = SAC('MlpPolicy', self.env, policy_kwargs=self.policy_kwargs, buffer_size=1000000)
         callback = self.create_callback(self.env)
         tb_log_name = f'sac_{self.id}'
         self.model.learn(total_timesteps=total_timesteps, callback=callback, tb_log_name=tb_log_name)
@@ -42,9 +42,10 @@ class SACFoosballAgent(FoosballAgent):
             env,
             best_model_save_path=self.id_subdir + '/sac/best_model',
             log_path=self.log_dir,
-            eval_freq=5000,
-            n_eval_episodes=5,
+            eval_freq=3000,
+            n_eval_episodes=10,
             render=False,
+            deterministic=True,
         )
         return eval_callback
 
