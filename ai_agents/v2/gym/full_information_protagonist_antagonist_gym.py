@@ -221,9 +221,6 @@ class FoosballEnv( MujocoTableRenderMixin, gym.Env, ):
         return math.sqrt((x - 0) ** 2 + (y - TABLE_MAX_Y_DIM) ** 2)
 
     def compute_reward(self, protagonist_action):
-        """
-        Compute the reward for the protagonist (Player A).
-        """
         ball_obs = self._get_ball_obs()
         ball_y = ball_obs[0][1]
         ball_x = ball_obs[0][0]
