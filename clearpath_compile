@@ -1,0 +1,32 @@
+1. Download sFoundation libraries on linux.
+
+2. Install the usb driver and give permission for ttyXRUSB0.
+$ cd ~/Clearpath/ExarKernelDriver
+$ sudo ./Install_DRV_SCRIPT.sh
+$ sudo usermod -a -G dialout $USER
+$ sudo reboot
+
+*** Make sure that the USB of the communication hub is connected to your system using the below command:
+$ ls /dev/ttyXRUSB*
+
+
+3. Build libraries through Makefile.
+$ cd ~/Clearpath/sFoundation/sFoundation
+$ make
+$ sudo ln -s libsFoundation20.so libsFoundation20.so.1
+
+4. Check if the 'libsFoundation20.so' file is created in the ~/Clearpath/sFoundation/sFoundation folder. Then, define the library address for your system to find it.
+$ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/Clearpath/sFoundation/sFoundation' >> ~/.bashrc
+$ source ~/.bashrc
+
+5. Go to the directory that includes servo_controller.cpp.
+$ cd ~/Clearpath/sFoundation/SDK_Examples/Example-Motion
+
+6. Compile servo_controller.cpp file (Everytime you modify the code, you need to compile.)
+$ g++ servo_controller.cpp -o servo_controller -I ~/Clearpath/sFoundation/inc/inc-pub  -L/home/steve/Clearpath/sFoundation/sFoundation -lsFoundation20 -lpthread
+
+6. Execute 
+$ servo_controller
+
+
+
